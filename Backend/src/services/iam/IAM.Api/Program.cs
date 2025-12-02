@@ -23,13 +23,18 @@ builder.Services.AddSwaggerGen(c =>
     { 
         Title = "IAM Service API", 
         Version = "v1",
-        Description = "Identity and Access Management Service"
+        Description = "Identity and Access Management Service",
+        Contact = new OpenApiContact
+        {
+            Name = "Support",
+            Email = "support@example.com"
+        }
     });
     
     // افزودن پشتیبانی از JWT در Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme.",
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
@@ -51,18 +56,39 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
+    
+    // تنظیمات XML Documentation
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (System.IO.File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
 });
 
 // افزودن DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured in appsettings.json");
 
-// افزودن Redis
-builder.Services.AddStackExchangeRedisCache(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(dbConnectionString));
+
+// افزودن Redis - با بررسی null بودن connection string
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+if (!string.IsNullOrEmpty(redisConnectionString))
 {
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "IAM_";
-});
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = "IAM_";
+    });
+}
+else
+{
+    // اگر Redis تنظیم نشده، از MemoryCache استفاده کن
+    builder.Services.AddDistributedMemoryCache();
+    Console.WriteLine("Redis connection string is not configured. Using in-memory cache instead.");
+}
 
 // ثبت Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -71,13 +97,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOtpService, RedisOtpService>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
-// // ثبت MediatR
-// builder.Services.AddMediatR(typeof(RegisterCommandHandler).Assembly);
-
-// تغییر این خط:
-// builder.Services.AddMediatR(typeof(RegisterCommandHandler).Assembly);
-
-// به این:
+// ثبت MediatR
 builder.Services.AddMediatR(cfg => 
 {
     cfg.RegisterServicesFromAssembly(typeof(RegisterCommandHandler).Assembly);
@@ -104,12 +124,34 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidAudience = jwtSettings["Audience"],
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.FromMinutes(5)
+    };
+    
+    // لاگ‌گیری برای دیباگ
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validated successfully");
+            return Task.CompletedTask;
+        }
     };
 });
 
 // افزودن Authorization
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => 
+        policy.RequireClaim("Role", "Admin"));
+    
+    options.AddPolicy("UserOnly", policy => 
+        policy.RequireClaim("Role", "User", "Admin"));
+});
 
 // تنظیم CORS
 builder.Services.AddCors(options =>
@@ -121,18 +163,41 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         });
+    
+    options.AddPolicy("Production",
+        builder =>
+        {
+            builder.WithOrigins("https://example.com")
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
+        });
+});
+
+// تنظیمات Health Check - با بررسی null بودن connection string
+var healthChecksBuilder = builder.Services.AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>();
+
+if (!string.IsNullOrEmpty(redisConnectionString))
+{
+    healthChecksBuilder.AddRedis(redisConnectionString);
+}
+else
+{
+    Console.WriteLine("Skipping Redis health check because Redis is not configured.");
+}
+
+// تنظیمات Response Compression
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
 });
 
 var app = builder.Build();
 
-// اجرای migrations در زمان راه‌اندازی
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await dbContext.Database.MigrateAsync();
-}
-
 // میدلورها
+app.UseResponseCompression();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -140,13 +205,84 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "IAM Service API V1");
         c.RoutePrefix = "swagger";
+        c.DisplayRequestDuration();
+        c.EnableDeepLinking();
+        c.DefaultModelsExpandDepth(-1); // غیرفعال کردن نمایش مدل‌ها
     });
+    
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
+}
+
+// اجرای migrations در زمان راه‌اندازی
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await dbContext.Database.MigrateAsync();
+        Console.WriteLine("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while applying migrations: {ex.Message}");
+    }
 }
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+
+// Health Check endpoint
+app.MapHealthChecks("/health");
+
+// Error handling endpoint
+app.Map("/error", (HttpContext context) =>
+{
+    var exceptionHandler = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+    var exception = exceptionHandler?.Error;
+    return Results.Problem(
+        detail: exception?.Message,
+        title: "An error occurred",
+        statusCode: StatusCodes.Status500InternalServerError
+    );
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
-app.Run();
+// Middleware برای لاگ‌گیری درخواست‌ها
+app.Use(async (context, next) =>
+{
+    var startTime = DateTime.UtcNow;
+    
+    await next();
+    
+    var endTime = DateTime.UtcNow;
+    var duration = endTime - startTime;
+    
+    Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {context.Request.Method} {context.Request.Path} - {context.Response.StatusCode} - {duration.TotalMilliseconds}ms");
+});
+
+// Default route
+app.MapGet("/", () => "IAM Service is running. Go to /swagger for API documentation.");
+
+try
+{
+    Console.WriteLine("Starting IAM Service...");
+    Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
+    Console.WriteLine($"URLs: {string.Join(", ", app.Urls)}");
+    
+    app.Run();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Application failed to start: {ex.Message}");
+    Console.WriteLine(ex.StackTrace);
+    throw;
+}
