@@ -147,3 +147,6 @@ C:\Users\mosta\OneDrive\Desktop\SE\Backend\src\services\iam\IAM.Api\obj\Debug\ne
 C:\Users\mosta\OneDrive\Desktop\SE\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\IAM.Api.pdb
 C:\Users\mosta\OneDrive\Desktop\SE\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\IAM.Api.genruntimeconfig.cache
 C:\Users\mosta\OneDrive\Desktop\SE\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\ref\IAM.Api.dll
+C:\Users\mosta\OneDrive\Desktop\SE\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
+C:\Users\mosta\OneDrive\Desktop\SE\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\MailKit.dll
+C:\Users\mosta\OneDrive\Desktop\SE\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\MimeKit.dll

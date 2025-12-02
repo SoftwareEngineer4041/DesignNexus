@@ -66,6 +66,11 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 
+builder.Services.AddScoped<IEmailService, EmailService>();
+// سپس RedisOtpService که اکنون به EmailService نیاز دارد را نگه دار
+builder.Services.AddScoped<IOtpService, RedisOtpService>();
+
+
 // افزودن DbContext
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured in appsettings.json");
