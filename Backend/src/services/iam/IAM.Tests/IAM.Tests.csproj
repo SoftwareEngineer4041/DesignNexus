@@ -12,6 +12,13 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    
+    <!-- اضافه کردن پکیج Moq برای mocking -->
+    <PackageReference Include="Moq" Version="4.20.70" />
+    
+    <!-- اگر نیاز به test containers دارید -->
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <PackageReference Include="Testcontainers.Redis" Version="3.8.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\IAM.Application\IAM.Application.csproj" />
     <ProjectReference Include="..\IAM.Domain\IAM.Domain.csproj" />
+    <ProjectReference Include="..\IAM.Infrastructure\IAM.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
