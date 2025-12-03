@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/confirm_email.css";
 import design_img from "../assets/design_img.png";
@@ -8,6 +8,17 @@ export default function VerifyCodePage() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(300); // 5 دقیقه = 300 ثانیه
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (resendTimer > 0) {
+      timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +42,32 @@ export default function VerifyCodePage() {
     }
   };
 
+  const handleResend = async () => {
+    setResendLoading(true);
+    setError("");
+    try {
+      const res = await fetch("http://localhost:8000/resend-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Failed to resend code");
+
+      setResendTimer(300); // دوباره 5 دقیقه
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  // فرمت نمایش دقیقه:ثانیه
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div className="verify-container">
       <form className="verify-card" onSubmit={handleSubmit}>
@@ -52,6 +89,18 @@ export default function VerifyCodePage() {
         <button className="verify-button" disabled={loading}>
           {loading ? "در حال بررسی..." : "تأیید"}
         </button>
+
+        <div className="resend-container">
+          <span className="resend-timer">{formatTime(resendTimer)}</span>
+          <button
+            type="button"
+            className="resend-button"
+            onClick={handleResend}
+            disabled={resendLoading || resendTimer > 0}
+          >
+            ارسال مجدد
+          </button>
+        </div>
       </form>
     </div>
   );

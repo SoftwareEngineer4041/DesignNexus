@@ -94,3 +94,32 @@
   text-align: center;
   font-size: 0.9rem;
 }
+.resend-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.resend-timer {
+  font-size: 0.9rem;
+  color: black;
+  opacity: 0.8;
+}
+
+.resend-button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.resend-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+
