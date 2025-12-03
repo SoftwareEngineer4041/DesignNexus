@@ -51,6 +51,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("ایمیل یا رمز عبور اشتباه است");
 
       const data = await res.json();
+      console.log(data);
       localStorage.setItem("access_token", data.access_token);
       navigate("/dashboard");
     } catch (err: any) {
