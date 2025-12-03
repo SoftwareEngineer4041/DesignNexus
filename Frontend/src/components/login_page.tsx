@@ -27,7 +27,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    // ➤ چک کردن خالی بودن
     const newErrors = {
       email: form.email.trim() === "",
       password: form.password.trim() === "",
@@ -35,7 +34,6 @@ export default function LoginPage() {
 
     setFieldErrors(newErrors);
 
-    // اگر خالی بود → ارسال نکن
     if (newErrors.email || newErrors.password) {
       setError("لطفاً همه فیلدها را پر کنید");
       return;
@@ -50,13 +48,13 @@ export default function LoginPage() {
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) throw new Error("Invalid credentials");
+      if (!res.ok) throw new Error("ایمیل یا رمز عبور اشتباه است");
 
       const data = await res.json();
       localStorage.setItem("access_token", data.access_token);
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      setError(err.message || "خطایی رخ داده است");
     } finally {
       setLoading(false);
     }
@@ -65,7 +63,7 @@ export default function LoginPage() {
   return (
     <div className="login-container">
       <form className="login-card" onSubmit={handleSubmit}>
-        <img src={design_img} className="design_image" />
+        <img src={design_img} className="design_image" alt="design" />
 
         {error && <p className="login-error">{error}</p>}
 
@@ -76,13 +74,10 @@ export default function LoginPage() {
           placeholder="ایمیل"
           value={form.email}
           onChange={handleChange}
-          style={{ marginTop: "30px" }}
         />
 
         <input
-          className={`login-input ${
-            fieldErrors.password ? "input-error" : ""
-          }`}
+          className={`login-input ${fieldErrors.password ? "input-error" : ""}`}
           type="password"
           name="password"
           placeholder="رمز عبور"

@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/signup_page.css";
-import design_img from "../assets/design_img.png"
+import design_img from "../assets/design_img.png";
 
 export default function SignupPage() {
-  // const navigate = useNavigate();
-
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    role:"کاربر",
+    role: "کاربر",
     password: "",
     confirmPassword: "",
   });
@@ -42,14 +40,14 @@ export default function SignupPage() {
 
   const handleGoVerify = (e: React.MouseEvent) => {
     if (!validateEmpty()) {
-      e.preventDefault(); // جلوگیری از رفتن به صفحه verify
+      e.preventDefault();
     }
   };
 
   return (
     <div className="signup-container">
       <form className="signup-card">
-        <img src={design_img} className="design_image" />
+        <img src={design_img} className="design_image" alt="design" />
 
         {error && <p className="signup-error">{error}</p>}
 
