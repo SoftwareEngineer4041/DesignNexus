@@ -22,7 +22,7 @@ namespace IAM.Application.DTOs
         public required string ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "نقش کاربر الزامی است")]
-        [RegularExpression("^(User|Designer|Admin)$", ErrorMessage = "نقش نامعتبر است")]
-        public string Role { get; set; } = "User";
+        [RegularExpression("^(طراح|کاربر)$", ErrorMessage = "نقش نامعتبر است")]
+        public string Role { get; set; } = "کاربر";
     }
 }
