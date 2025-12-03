@@ -1,26 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./WelcomePage.css";
+import "../styles/welcome.css";
 
 interface User {
   name: string;
   email: string;
 }
 
-interface WelcomePageProps {
-  user: User | null;
-}
-
-const WelcomePage: React.FC<WelcomePageProps> = ({ user }) => {
+const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    // خواندن کاربر از localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    } else {
       navigate("/login");
     }
-  }, [user, navigate]);
+  }, [navigate]);
 
-  if (!user) return null; // یا لودینگ ساده
+  if (!user) {
+    return <div>در حال بارگذاری...</div>;
+  }
 
   return (
     <div className="welcome-container">
