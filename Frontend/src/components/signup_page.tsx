@@ -38,11 +38,41 @@ export default function SignupPage() {
     return true;
   };
 
-  const handleGoVerify = (e: React.MouseEvent) => {
-    if (!validateEmpty()) {
-      e.preventDefault();
-    }
+  
+
+  const handleGoVerify = async (e: React.MouseEvent) => {
+  if (!validateEmpty()) {
+    e.preventDefault();
+    return;
+  }
+
+  // آماده‌سازی داده‌ها
+  const payload = {
+    fullName: `${form.firstName} ${form.lastName}`,
+    email: form.email,
+    password: form.password,
+    confirmPassword: form.confirmPassword,
+    role: form.role,
   };
+
+  try {
+    const response = await fetch("YOUR_BACKEND_ENDPOINT_HERE", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    console.log("Server response:", data);
+    // می‌تونی اینجا بر اساس پاسخ سرور کاری انجام بدی
+  } catch (err) {
+    console.error("Error sending signup data:", err);
+    setError("مشکلی در ثبتنام پیش آمده است");
+  }
+};
+
 
   return (
     <div className="signup-container">
