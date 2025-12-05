@@ -40,13 +40,13 @@ export async function loginUser(
 /* ---------- Register ---------- */
 
 export interface RegisterForm {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
-  role: string;
   password: string;
   confirmPassword: string;
+  role: string;
 }
+
 
 export interface RegisterResponse {
   message?: string;

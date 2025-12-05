@@ -8,10 +8,19 @@ import {
   type RegisterForm,
 } from "../API/authAPI";
 
+interface SignupFormUI {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  password: string;
+  confirmPassword: string;
+}
+
 export default function SignupPage() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState<RegisterForm>({
+  const [form, setForm] = useState<SignupFormUI>({
     firstName: "",
     lastName: "",
     email: "",
@@ -29,7 +38,10 @@ export default function SignupPage() {
   ) => {
     const { name, value } = e.target;
 
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
     setTouched((prev) => ({ ...prev, [name]: false }));
     setError("");
@@ -80,11 +92,18 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await registerUser(form);
+      const payload: RegisterForm = {
+        fullName: `${form.firstName} ${form.lastName}`,
+        email: form.email,
+        password: form.password,
+        confirmPassword: form.confirmPassword,
+        role: form.role
+      };
+
+      const response = await registerUser(payload);
 
       console.log("Signup success:", response);
 
-      // ذخیره ایمیل برای صفحه Verify
       localStorage.setItem("signupEmail", form.email);
 
       navigate("/verify", { state: { email: form.email } });
