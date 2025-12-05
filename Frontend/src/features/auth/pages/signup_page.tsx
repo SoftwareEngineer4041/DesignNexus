@@ -1,3 +1,5 @@
+// SignupPage.tsx
+
 import { useState, type ChangeEvent, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/signup_page.css";
@@ -110,7 +112,7 @@ export default function SignupPage() {
     } catch (err: any) {
       console.log("Server Error:", err);
 
-      // ۱) اگر بک‌اند message برگردونده
+      // ۱) اگر بک‌اند message برگردونده باشد
       if (err?.message && typeof err.message === "string") {
         setError(err.message);
       }
@@ -119,11 +121,22 @@ export default function SignupPage() {
         setError(err);
       }
       // ۳) اگر مدل خطای ASP.NET Core (errors) بود
-      else if (err?.errors) {
+      //    مثل: { errors: { Password: ["رمز باید 8 کاراکتر باشد"] } }
+      else if (err?.errors && typeof err.errors === "object") {
         try {
-          const firstErrorArray = Object.values(err.errors)[0] as string[] | undefined;
-          if (firstErrorArray && firstErrorArray.length > 0) {
-            setError(firstErrorArray[0]);
+          const keys = Object.keys(err.errors);
+          if (keys.length > 0) {
+            const firstKey = keys[0]; // مثلاً "Password"
+            const value = (err.errors as any)[firstKey];
+
+            if (Array.isArray(value) && value.length > 0) {
+              // اینجا می‌شود: "رمز باید 8 کاراکتر باشد"
+              setError(value[0]);
+            } else if (typeof value === "string") {
+              setError(value);
+            } else {
+              setError("خطای ناشناخته‌ای رخ داده");
+            }
           } else {
             setError("خطای ناشناخته‌ای رخ داده");
           }
@@ -131,9 +144,9 @@ export default function SignupPage() {
           setError("خطای ناشناخته‌ای رخ داده");
         }
       }
-      // ۴) اگر title / detail داشت
+      // ۴) اگر title / detail داشت (بعضی از خطاهای دیگر ASP.NET)
       else if (err?.title || err?.detail) {
-        setError(err.title || err.detail || "خطای ناشناخته‌ای رخ داده");
+        setError(err.detail || err.title || "خطای ناشناخته‌ای رخ داده");
       }
       // ۵) fallback
       else {

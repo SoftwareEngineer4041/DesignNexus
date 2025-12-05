@@ -39,6 +39,9 @@ export async function loginUser(
 
 /* ---------- Register ---------- */
 
+// authAPI.ts
+
+// اینو خودت از قبل داشتی
 export interface RegisterForm {
   fullName: string;
   email: string;
@@ -47,11 +50,13 @@ export interface RegisterForm {
   role: string;
 }
 
-
 export interface RegisterResponse {
   message?: string;
   [key: string]: any;
 }
+
+// فرض می‌کنم BASE_URL رو جای دیگه تعریف کردی و اینجا ایمپورت می‌کنی
+// import { BASE_URL } from "./config";
 
 export async function registerUser(
   form: RegisterForm
@@ -64,15 +69,22 @@ export async function registerUser(
   });
 
   if (!response.ok) {
+    // اینجا بدنه‌ی خطا رو می‌خونیم (همون { errors: { Password: [...] } })
+    let errBody: any;
+
     try {
-      const err = await response.json();
-      // هر پیامی که بک‌اند فرستاده را پاس می‌دهیم
-      throw err;
+      errBody = await response.json();
     } catch {
+      // اگر نتونستیم JSON بخونیم، یه پیام کلی برمی‌گردونیم
       throw { message: "خطای ثبت‌نام" };
     }
+
+    // همون چیزی که بک‌اند فرستاده رو می‌اندازیم بیرون
+    // مثلاً: { errors: { Password: ["رمز باید 8 کاراکتر باشد"] } }
+    throw errBody;
   }
 
+  // در صورت موفقیت
   return await response.json();
 }
 
