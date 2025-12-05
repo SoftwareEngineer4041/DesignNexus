@@ -19,11 +19,18 @@ export default function SignupPage() {
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    // وقتی کاربر وارد میشه، می‌تونیم touched رو پاک کنیم برای اون فیلد
+
     setTouched((prev) => ({ ...prev, [e.target.name]: false }));
     setError("");
+  };
+
+  
+  const validateEmail = (value: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   };
 
   const validateEmpty = () => {
@@ -42,7 +49,6 @@ export default function SignupPage() {
       return false;
     }
 
-    // بررسی تطابق رمز و تکرارش
     if (form.password !== form.confirmPassword) {
       setError("رمز عبور و تکرار آن مطابقت ندارند");
       setTouched({ password: true, confirmPassword: true });
@@ -53,10 +59,18 @@ export default function SignupPage() {
   };
 
   const handleGoVerify = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
+    e.preventDefault();
     setError("");
 
+    // ✔ چک خالی بودن
     if (!validateEmpty()) {
+      return;
+    }
+
+    // ✔ چک ایمیل درست
+    if (!validateEmail(form.email)) {
+      setError("ایمیل نامعتبر است.");
+      setTouched((prev) => ({ ...prev, email: true }));
       return;
     }
 
@@ -71,42 +85,40 @@ export default function SignupPage() {
     };
 
     try {
-      const response = await fetch("http://localhost:5209/api/Auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "http://localhost:5209/api/Auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await response.json();
 
       console.log("payload:", payload);
       console.log("server response:", data);
 
-      // مسیردهی فقط وقتی سرور OK هست (کد 200-299) یا وقتی بدنه پاسخ یک فیلد success داره
       if (response.ok) {
-        // اگر می‌خواهی پیام موفقیت نمایش بدی:
-        // setError("ثبت‌نام موفق! لطفاً کد تایید ایمیل را وارد کنید");
-        // سپس نِویگیت کن
         localStorage.setItem("signupEmail", form.email);
-        navigate("/verify", { state: { email: form.email } });
+
+        navigate("/verify", {
+          state: { email: form.email },
+        });
+
       } else {
-        // خطا از سمت سرور؛ متن خطا رو از پاسخ نمایش بده (اگر موجود باشه)
-        // const serverMessage = data?.message || "مشکلی در ثبت‌نام پیش آمد";
-        // setError(serverMessage);   
         if (data?.errors) {
-    const firstKey = Object.keys(data.errors)[0]; // مثل "Password"
-    const firstMessage = data.errors[firstKey][0]; // مثل "رمز عبور باید حداقل 8 کاراکتر باشد"
-
-    setError(firstMessage);
-  } else if (data?.message) {
-    setError(data.message);
-  } else {
-    setError("خطای نامشخصی رخ داده");
-  }
-
-  return;                                                                                  
+          const firstKey = Object.keys(data.errors)[0];
+          const firstMessage = data.errors[firstKey][0];
+          setError(firstMessage);
+        } else if (data?.message) {
+          setError(data.message);
+        } else {
+          setError("خطای نامشخصی رخ داده");
+        }
+        return;
       }
     } catch (err) {
       console.error("Error sending signup data:", err);
@@ -184,7 +196,6 @@ export default function SignupPage() {
           onChange={handleChange}
         />
 
-        {/* دکمه‌ای که فقط وقتی جواب موفق از سرور اومد navigate می‌کنه */}
         <button
           type="button"
           className="signup-button"

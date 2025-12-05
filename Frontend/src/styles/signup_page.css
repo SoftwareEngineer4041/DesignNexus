@@ -24,12 +24,12 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   width: 400px;
-  height: auto; /* ارتفاع خودکار به جای 80% */
-  max-height: 90vh; /* حداکثر ارتفاع برای جلوگیری از خروج محتوا */
+  height: auto; 
+  max-height: 90vh; 
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  overflow: auto; /* فعال شدن اسکرول داخلی در صورت زیاد شدن محتوا */
+  overflow: auto; 
 }
 
 
@@ -43,13 +43,13 @@
   background-image: url("../assets/logo.jpg");
   background-size: cover;
   background-position: center;
-  opacity: 0.2; /* شفافیت تصویر */
+  opacity: 0.2;
   z-index: 0;
 }
 
 .signup-card > * {
   position: relative;
-  z-index: 1; /* محتوای کارت بالای تصویر باشه */
+  z-index: 1; 
 }
 
 .signup-title {
@@ -81,6 +81,7 @@
   color: white;
   font-size: 1rem;
   cursor: pointer;
+  direction: rtl;
 }
 
 .signup-button:disabled {

@@ -6,13 +6,16 @@
   height: 100vh;
   font-family: sans-serif;
   background-color: #f0f4f8;
+  direction: rtl;
 }
 
 .welcome-heading {
   color: #333;
+  direction: rtl;
 }
 
 .welcome-text {
   color: #555;
   margin-top: 8px;
+  direction: rtl;
 }

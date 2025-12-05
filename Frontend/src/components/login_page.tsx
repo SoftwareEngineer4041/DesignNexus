@@ -52,7 +52,7 @@ export default function LoginPage() {
 
       const data = await res.json();
       console.log(data);
-      localStorage.setItem("access_token", data.access_token);
+      // localStorage.setItem("access_token", data.access_token);
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.message || "خطایی رخ داده است");
@@ -91,9 +91,8 @@ export default function LoginPage() {
         </p>
 
         <button className="login-button" disabled={loading}>
-          {loading ? "لطفا صبر کنید" : "ورود"}
+          {loading ? "لطفا صبر کنید..." : "ورود"}
         </button>
-
         <p className="login-link">
           حساب ندارید؟ <Link to="/signup">ثبت‌نام کنید</Link>
         </p>

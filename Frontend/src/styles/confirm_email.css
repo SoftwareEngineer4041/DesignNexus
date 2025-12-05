@@ -6,7 +6,6 @@
   background-color: #f4efc0;
 }
 
-/* کارت مشابه signup-card */
 .verify-card {
   position: relative;
   background-color: #FAFAFA;
@@ -115,6 +114,7 @@
   color: white;
   font-size: 0.85rem;
   cursor: pointer;
+  direction: rtl;
 }
 
 .resend-button:disabled {

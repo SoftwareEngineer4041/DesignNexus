@@ -12,7 +12,7 @@ export default function VerifyCodePage() {
   const [error, setError] = useState("");
 
   const [resendLoading, setResendLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(300); // 5 دقیقه = 300 ثانیه
+  const [resendTimer, setResendTimer] = useState(300); 
 
   useEffect(() => {
     const stateEmail = (location.state as any)?.email;
@@ -24,8 +24,6 @@ export default function VerifyCodePage() {
       setEmail(storedEmail);
     } else {
       setError("ایمیل کاربر برای تأیید یافت نشد. لطفاً مجدداً ثبت‌نام کنید.");
-      // می‌تونی کاربر رو به signup هدایت کنی:
-      // setTimeout(() => navigate("/signup"), 2000);
     }
   }, [location.state, navigate]);
 
@@ -68,8 +66,6 @@ export default function VerifyCodePage() {
         return;
       }
 
-      // فرض: سرور اطلاعات کاربر را در پاسخ می‌دهد (مثلاً { name, email, token })
-      // اگر سرور فقط OK می‌دهد، حداقل ایمیل را ذخیره کن
       const userToStore: any = {
         email,
         name: data?.name ?? email.split("@")[0],
@@ -79,7 +75,7 @@ export default function VerifyCodePage() {
       }
 
       localStorage.setItem("user", JSON.stringify(userToStore));
-      localStorage.removeItem("signupEmail"); // پاک کردن ایمیل ثبت‌نام موقت
+      localStorage.removeItem("signupEmail"); 
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.message || "خطا در ارتباط با سرور");
@@ -99,11 +95,10 @@ export default function VerifyCodePage() {
     setError("");
 
     try {
-      // توجه: اغلب سرورها برای resend نیاز به email دارن، نه code
       const res = await fetch("http://localhost:5209/api/Auth/resend-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }), // قبلاً {code} بود — اصلاح شد
+        body: JSON.stringify({ email }), 
       });
 
       const data = await res.json().catch(() => null);
@@ -113,7 +108,7 @@ export default function VerifyCodePage() {
         return;
       }
 
-      setResendTimer(300); // دوباره 5 دقیقه
+      setResendTimer(300); 
     } catch (err: any) {
       setError(err.message || "خطا در ارسال درخواست");
     } finally {
