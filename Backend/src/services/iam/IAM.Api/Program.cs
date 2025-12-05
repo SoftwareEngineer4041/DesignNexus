@@ -239,7 +239,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseHttpsRedirection();
+// temp comment
+// app.UseHttpsRedirection();
+
+
 // app.UseCors("AllowAll");
 app.UseCors(builder => builder
     .WithOrigins("http://localhost:5173") // origin دقیق را مشخص کنید
