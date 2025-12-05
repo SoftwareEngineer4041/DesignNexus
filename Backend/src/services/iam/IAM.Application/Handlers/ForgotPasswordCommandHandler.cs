@@ -1,48 +1,44 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using IAM.Application.Commands;
 using IAM.Application.DTOs;
 using IAM.Domain.Interfaces;
-using IAM.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace IAM.Application.Handlers
 {
-    public class ResendCodeCommandHandler : IRequestHandler<ResendCodeCommand, AuthResponseDto>
+    public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, AuthResponseDto>
     {
         private readonly IUserRepository _userRepository;
         private readonly IOtpService _otpService;
-        private readonly ILogger<ResendCodeCommandHandler> _logger;
+        private readonly ILogger<ForgotPasswordCommandHandler> _logger;
 
-        public ResendCodeCommandHandler(
+        public ForgotPasswordCommandHandler(
             IUserRepository userRepository,
             IOtpService otpService,
-            ILogger<ResendCodeCommandHandler> logger)
+            ILogger<ForgotPasswordCommandHandler> logger)
         {
             _userRepository = userRepository;
             _otpService = otpService;
             _logger = logger;
         }
 
-        public async Task<AuthResponseDto> Handle(ResendCodeCommand command, CancellationToken cancellationToken)
+        public async Task<AuthResponseDto> Handle(ForgotPasswordCommand command, CancellationToken cancellationToken)
         {
             try
             {
                 var request = command.Request;
                 if (!await _userRepository.EmailExistsAsync(request.Email))
                 {
-                    _logger.LogWarning($"Invalid password for user: {request.Email}");
+                    _logger.LogInformation($"Email: {request.Email} not found");
                     return AuthResponseDto.FailureResponse("ایمیل اشتباه است");
-                
                 }
                 
-                User? user = await _userRepository.GetByEmailAsync(request.Email);
+                await _otpService.GenerateOtpAsync(request.Email);
 
-                var otp = await _otpService.GenerateOtpAsync(request.Email);
-                
-
-                _logger.LogInformation($"OTP for {request.Email}: {otp}");
+                var user = await _userRepository.GetByEmailAsync(request.Email);
 
                 return AuthResponseDto.SuccessResponse(
                     "کد تایید دوباره برایتان ارسال شد",
@@ -59,8 +55,8 @@ namespace IAM.Application.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in resend otp code");
-                return AuthResponseDto.FailureResponse("خطا در ارسال. لطفاً مجدداً تلاش کنید");
+                _logger.LogError(ex, "Error in update password");
+                return AuthResponseDto.FailureResponse("خطا در تغییر رمز. لطفاً مجدداً تلاش کنید");
             }
         }
     }
