@@ -58,6 +58,14 @@ export default function VerifyCodePage() {
         body: JSON.stringify(info),
       });
 
+//   const res = await fetch("http://localhost:5209/api/Auth/verify", {
+//   method: "POST",
+//   credentials: "include" // for receving token
+//   headers: { "Content-Type": "application/json" },
+//   body: JSON.stringify(info),
+// });
+
+
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
@@ -100,6 +108,14 @@ export default function VerifyCodePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }), 
       });
+
+//   const res = await fetch("http://localhost:5209/api/Auth/resend-code", {
+//   method: "POST",
+//   credentials: "include" // receving token
+//   headers: { "Content-Type": "application/json" },
+//   body: JSON.stringify({ email }),
+// });
+
 
       const data = await res.json().catch(() => null);
       if (!res.ok) {

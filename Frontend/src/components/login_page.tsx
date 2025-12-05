@@ -48,6 +48,14 @@ export default function LoginPage() {
         body: JSON.stringify(form),
       });
 
+//   const res = await fetch("http://localhost:5209/api/Auth/login", {
+//   method: "POST",
+//   credentials: "include" // thid line is for receving token from backend
+//   headers: { "Content-Type": "application/json" },
+//   body: JSON.stringify(form),
+// });
+
+
       if (!res.ok) throw new Error("ایمیل یا رمز عبور اشتباه است");
 
       const data = await res.json();
