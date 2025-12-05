@@ -240,7 +240,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // temp comment
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 
 // app.UseCors("AllowAll");
