@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ChangeEvent, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/signup_page.css";
 import design_img from "../assets/design_img.png";
@@ -34,7 +34,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
@@ -83,7 +83,7 @@ export default function SignupPage() {
     return true;
   };
 
-  const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSignup = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setError("");
 
@@ -93,11 +93,11 @@ export default function SignupPage() {
 
     try {
       const payload: RegisterForm = {
-        fullName: `${form.firstName} ${form.lastName}`,
+        fullName: `${form.firstName} ${form.lastName}`.trim(),
         email: form.email,
         password: form.password,
         confirmPassword: form.confirmPassword,
-        role: form.role
+        role: form.role,
       };
 
       const response = await registerUser(payload);
@@ -107,10 +107,36 @@ export default function SignupPage() {
       localStorage.setItem("signupEmail", form.email);
 
       navigate("/verify", { state: { email: form.email } });
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || "خطای ناشناخته‌ای رخ داده");
-      } else {
+    } catch (err: any) {
+      console.log("Server Error:", err);
+
+      // ۱) اگر بک‌اند message برگردونده
+      if (err?.message && typeof err.message === "string") {
+        setError(err.message);
+      }
+      // ۲) اگر خود err رشته بود
+      else if (typeof err === "string") {
+        setError(err);
+      }
+      // ۳) اگر مدل خطای ASP.NET Core (errors) بود
+      else if (err?.errors) {
+        try {
+          const firstErrorArray = Object.values(err.errors)[0] as string[] | undefined;
+          if (firstErrorArray && firstErrorArray.length > 0) {
+            setError(firstErrorArray[0]);
+          } else {
+            setError("خطای ناشناخته‌ای رخ داده");
+          }
+        } catch {
+          setError("خطای ناشناخته‌ای رخ داده");
+        }
+      }
+      // ۴) اگر title / detail داشت
+      else if (err?.title || err?.detail) {
+        setError(err.title || err.detail || "خطای ناشناخته‌ای رخ داده");
+      }
+      // ۵) fallback
+      else {
         setError("خطای ناشناخته‌ای رخ داده");
       }
     } finally {

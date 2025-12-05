@@ -64,14 +64,13 @@ export async function registerUser(
   });
 
   if (!response.ok) {
-    let message = "خطای ثبت‌نام";
-
     try {
       const err = await response.json();
-      if (err?.message) message = err.message;
-    } catch {}
-
-    throw new Error(message);
+      // هر پیامی که بک‌اند فرستاده را پاس می‌دهیم
+      throw err;
+    } catch {
+      throw { message: "خطای ثبت‌نام" };
+    }
   }
 
   return await response.json();
