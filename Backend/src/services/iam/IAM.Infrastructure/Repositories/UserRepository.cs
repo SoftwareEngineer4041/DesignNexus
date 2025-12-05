@@ -15,12 +15,12 @@ namespace IAM.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<User> GetByIdAsync(int userId)
+        public async Task<User?> GetByIdAsync(int userId)
         {
             return await _context.Users.FindAsync(userId);
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email.ToLower());

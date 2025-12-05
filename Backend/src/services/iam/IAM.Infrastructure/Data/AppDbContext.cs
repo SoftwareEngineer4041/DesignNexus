@@ -15,7 +15,6 @@ namespace IAM.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // تنظیمات User Entity
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.UserId);

@@ -158,7 +158,6 @@ C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\ia
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\IAM.Api.runtimeconfig.json
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\IAM.Api.dll
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\IAM.Api.pdb
-C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\IAM.Api.xml
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\HealthChecks.NpgSql.dll
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\HealthChecks.Redis.dll
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\BCrypt.Net-Next.dll
@@ -298,7 +297,15 @@ C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\ia
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\IAM.Api.csproj.Up2Date
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\IAM.Api.dll
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\refint\IAM.Api.dll
-C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\IAM.Api.xml
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\IAM.Api.pdb
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\IAM.Api.genruntimeconfig.cache
 C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\obj\Debug\net9.0\ref\IAM.Api.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.Logging.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
+C:\Users\mosta\OneDrive\Desktop\Design Nexus\DesignNexus\Backend\src\services\iam\IAM.Api\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll

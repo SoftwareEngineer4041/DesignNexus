@@ -2,6 +2,7 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using IAM.Domain.Interfaces;
 
 public class EmailService : IEmailService
 {
@@ -22,7 +23,7 @@ public class EmailService : IEmailService
         message.Body = bodyBuilder.ToMessageBody();
 
         using var client = new SmtpClient();
-        await client.ConnectAsync(_config["Smtp:Host"], int.Parse(_config["Smtp:Port"]), false);
+        await client.ConnectAsync(_config["Smtp:Host"], int.Parse(_config["Smtp:Port"]!), false);
         await client.AuthenticateAsync(_config["Smtp:Username"], _config["Smtp:Password"]);
         await client.SendAsync(message);
         await client.DisconnectAsync(true);

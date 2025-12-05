@@ -38,18 +38,15 @@ namespace IAM.Application.Handlers
                 return AuthResponseDto.FailureResponse("کد OTP نامعتبر یا منقضی شده است");
             }
 
-            // پیدا کردن کاربر
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user == null)
             {
                 return AuthResponseDto.FailureResponse("کاربر پیدا نشد");
             }
 
-            // علامت‌گذاری کاربر به عنوان تأیید شده
             user.MarkAsVerified();
             await _userRepository.UpdateAsync(user);
 
-            // ایجاد توکن JWT
             var token = await _tokenService.GenerateTokenAsync(user);
 
             _logger.LogInformation($"User {user.Email} verified successfully");

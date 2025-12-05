@@ -5,15 +5,15 @@ using System;
 using System.Threading.Tasks;
 using System.Text.Json;
 
-public class RedisOtpService : IOtpService
+public class OtpService : IOtpService
 {
     private readonly IDistributedCache _cache;
-    private readonly ILogger<RedisOtpService> _logger;
+    private readonly ILogger<OtpService> _logger;
     private readonly IEmailService _emailService;
     private const int OtpExpirationMinutes = 5;
     private const int OtpLength = 6;
 
-    public RedisOtpService(IDistributedCache cache, ILogger<RedisOtpService> logger, IEmailService emailService)
+    public OtpService(IDistributedCache cache, ILogger<OtpService> logger, IEmailService emailService)
     {
         _cache = cache;
         _logger = logger;
@@ -44,10 +44,9 @@ public class RedisOtpService : IOtpService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send OTP email");
-            // تصمیم بگیر: آیا باید OTP را از cache حذف کنیم یا نه؟ فعلاً نگه می‌داریم ولی می‌توان حذف کرد.
         }
 
-        return otp; // برای تست می‌توانیم OTP را برگردانیم (در پروداکشن معمولاً برنمی‌گردانیم)
+        return otp; 
     }
 
     public async Task<bool> ValidateOtpAsync(string email, string otp)

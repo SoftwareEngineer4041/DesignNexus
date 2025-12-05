@@ -31,17 +31,19 @@ namespace IAM.Application.Handlers
             try
             {
                 var request = command.Request;
-
-                // بررسی تکراری نبودن ایمیل
+                User? existingUser = null;
                 if (await _userRepository.EmailExistsAsync(request.Email))
                 {
-                    return AuthResponseDto.FailureResponse("این ایمیل قبلاً ثبت شده است");
+                    existingUser = await _userRepository.GetByEmailAsync(request.Email);
+                    if (existingUser != null && existingUser.IsVerified)
+                    {
+                        return AuthResponseDto.FailureResponse("این ایمیل قبلاً ثبت شده است");
+                    }
                 }
 
-                // هش کردن رمز عبور
                 string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-                // ایجاد کاربر جدید
+                
                 var user = new User(
                     request.FullName,
                     request.Email.ToLower(),
@@ -49,19 +51,19 @@ namespace IAM.Application.Handlers
                     request.Role
                 );
 
-                // ذخیره کاربر در دیتابیس
-                await _userRepository.AddAsync(user);
+                if (existingUser == null)
+                {
+                    await _userRepository.AddAsync(user);
+                }
 
-                // ایجاد و ارسال OTP
                 var otp = await _otpService.GenerateOtpAsync(request.Email);
                 
-                // در اینجا باید OTP را از طریق ایمیل ارسال کنید
-                // فعلاً فقط لاگ می‌کنیم
+
                 _logger.LogInformation($"OTP for {request.Email}: {otp}");
 
                 return AuthResponseDto.SuccessResponse(
                     "ثبت‌نام موفقیت‌آمیز بود. لطفاً ایمیل خود را تأیید کنید.",
-                    null,
+                    string.Empty,
                     new UserDto
                     {
                         UserId = user.UserId,
@@ -78,5 +80,6 @@ namespace IAM.Application.Handlers
                 return AuthResponseDto.FailureResponse("خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید");
             }
         }
+    
     }
 }

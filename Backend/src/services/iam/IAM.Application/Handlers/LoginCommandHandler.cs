@@ -31,7 +31,6 @@ namespace IAM.Application.Handlers
             {
                 var request = command.Request;
 
-                // پیدا کردن کاربر با ایمیل
                 var user = await _userRepository.GetByEmailAsync(request.Email);
                 if (user == null)
                 {
@@ -39,14 +38,12 @@ namespace IAM.Application.Handlers
                     return AuthResponseDto.FailureResponse("ایمیل یا رمز عبور اشتباه است");
                 }
 
-                // بررسی تأیید ایمیل کاربر
                 if (!user.IsVerified)
                 {
                     _logger.LogWarning($"Login attempt for unverified user: {request.Email}");
                     return AuthResponseDto.FailureResponse("لطفاً ابتدا حساب خود را تأیید کنید");
                 }
 
-                // بررسی رمز عبور
                 bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
                 if (!isPasswordValid)
                 {
@@ -54,7 +51,6 @@ namespace IAM.Application.Handlers
                     return AuthResponseDto.FailureResponse("ایمیل یا رمز عبور اشتباه است");
                 }
 
-                // ایجاد توکن JWT
                 var token = await _tokenService.GenerateTokenAsync(user);
 
                 _logger.LogInformation($"User {user.Email} logged in successfully");

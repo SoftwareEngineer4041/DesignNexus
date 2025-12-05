@@ -11,7 +11,6 @@ namespace IAM.Domain.Entities
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
 
-        // Private constructor for EF Core
         private User() 
         {
             FullName = string.Empty;

@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // افزودن خدمات به container
@@ -68,7 +69,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 // سپس RedisOtpService که اکنون به EmailService نیاز دارد را نگه دار
-builder.Services.AddScoped<IOtpService, RedisOtpService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
 
 
 // افزودن DbContext
@@ -99,8 +100,8 @@ else
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // ثبت Services
-builder.Services.AddScoped<IOtpService, RedisOtpService>();
-builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // ثبت MediatR
 builder.Services.AddMediatR(cfg => 

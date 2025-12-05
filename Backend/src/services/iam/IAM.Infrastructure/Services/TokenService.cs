@@ -12,11 +12,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace IAM.Infrastructure.Services
 {
-    public class JwtTokenService : ITokenService
+    public class TokenService : ITokenService
     {
         private readonly IConfiguration _configuration;
 
-        public JwtTokenService(IConfiguration configuration)
+        public TokenService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -24,7 +24,7 @@ namespace IAM.Infrastructure.Services
         public Task<string> GenerateTokenAsync(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]);
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -54,7 +54,7 @@ namespace IAM.Infrastructure.Services
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]);
+                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!);
 
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
@@ -81,9 +81,8 @@ namespace IAM.Infrastructure.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(token);
             
-            // حالا FirstOrDefault کار می‌کند
             var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            return Task.FromResult(userIdClaim?.Value);
+            return Task.FromResult(userIdClaim?.Value ?? string.Empty);
         }
     }
 }
