@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // 👈 useNavigate اضافه شد
 import "../styles/reset_password.css";
 
 import {
   sendPasswordResetLink,
   type PasswordResetPayload,
-} from "../API/authAPI"; // مسیر رو مطابق ساختار پروژه خودت تنظیم کن
+} from "../API/authAPI";
 
 export default function PasswordResetPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const navigate = useNavigate(); // 👈 اینجا
 
   const validateEmail = (value: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -36,11 +38,21 @@ export default function PasswordResetPage() {
     const payload: PasswordResetPayload = { email };
 
     try {
+      // فرض می‌کنیم بک‌اند در صورت نبودن ایمیل خطا می‌دهد
+      // (مثلاً 404 یا 400) و اینجا catch می‌شود.
       await sendPasswordResetLink(payload);
-      setSuccess("اگر ایمیل شما ثبت شده باشد، لینک بازنشانی ارسال خواهد شد.");
-      setEmail("");
+
+      // ✅ اگر درخواست موفق بود، برو به صفحه‌ی verify
+      // و ایمیل را با state بفرست
+      navigate("/verify", { state: { email } });
+
+      // اگر دوست داری می‌تونی موفقیت هم ست کنی
+      // setSuccess("اگر ایمیل شما ثبت شده باشد، لینک بازنشانی ارسال خواهد شد.");
+      // setEmail("");
     } catch (err) {
       if (err instanceof Error) {
+        // اینجا می‌تونی بر اساس پیام بک‌اند تشخیص بدی
+        // که ایمیل وجود نداشت و پیام مناسب بدهی
         setError(err.message || "خطا در ارتباط با سرور.");
       } else {
         setError("خطا در ارتباط با سرور.");

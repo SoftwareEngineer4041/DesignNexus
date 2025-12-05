@@ -120,17 +120,14 @@ export default function SignupPage() {
       else if (typeof err === "string") {
         setError(err);
       }
-      // ۳) اگر مدل خطای ASP.NET Core (errors) بود
-      //    مثل: { errors: { Password: ["رمز باید 8 کاراکتر باشد"] } }
       else if (err?.errors && typeof err.errors === "object") {
         try {
           const keys = Object.keys(err.errors);
           if (keys.length > 0) {
-            const firstKey = keys[0]; // مثلاً "Password"
+            const firstKey = keys[0]; 
             const value = (err.errors as any)[firstKey];
 
             if (Array.isArray(value) && value.length > 0) {
-              // اینجا می‌شود: "رمز باید 8 کاراکتر باشد"
               setError(value[0]);
             } else if (typeof value === "string") {
               setError(value);
@@ -144,11 +141,9 @@ export default function SignupPage() {
           setError("خطای ناشناخته‌ای رخ داده");
         }
       }
-      // ۴) اگر title / detail داشت (بعضی از خطاهای دیگر ASP.NET)
       else if (err?.title || err?.detail) {
         setError(err.detail || err.title || "خطای ناشناخته‌ای رخ داده");
       }
-      // ۵) fallback
       else {
         setError("خطای ناشناخته‌ای رخ داده");
       }
