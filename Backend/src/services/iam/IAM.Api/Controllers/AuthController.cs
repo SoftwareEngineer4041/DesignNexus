@@ -68,5 +68,21 @@ namespace IAM.Api.Controllers
             return Unauthorized(result);
         }
 
+        [HttpPost("resend-code")]
+        public async Task<IActionResult> ResendCode([FromBody] ResendCodeRequestDto request)
+        {
+            _logger.LogInformation($"Login attempt for email: {request.Email}");
+            
+            var command = new ResendCodeCommand(request);
+            var result = await _mediator.Send(command);
+            
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            
+            return Unauthorized(result);
+        }
+
     }
 }
