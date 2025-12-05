@@ -1,33 +1,60 @@
-import { useState } from "react";
+// LoginPage.tsx
+
+import {
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/login_page.css";
 import design_img from "../assets/design_img.png";
+import { loginUser } from "../API/authAPI"; 
+// ⬆️ مسیر را با توجه به ساختار خودت تنظیم کن
+
+interface LoginFormState {
+  email: string;
+  password: string;
+}
+
+interface FieldErrors {
+  email: boolean;
+  password: boolean;
+}
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<LoginFormState>({
     email: "",
     password: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState({
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({
     email: false,
     password: false,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setFieldErrors({ ...fieldErrors, [e.target.name]: false });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setFieldErrors((prev) => ({
+      ...prev,
+      [name]: false,
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const newErrors = {
+    const newErrors: FieldErrors = {
       email: form.email.trim() === "",
       password: form.password.trim() === "",
     };
@@ -42,28 +69,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5209/api/Auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+      const data = await loginUser({
+        email: form.email,
+        password: form.password,
       });
 
-//   const res = await fetch("http://localhost:5209/api/Auth/login", {
-//   method: "POST",
-//   credentials: "include" // thid line is for receving token from backend
-//   headers: { "Content-Type": "application/json" },
-//   body: JSON.stringify(form),
-// });
+      console.log("Login success:", data);
 
-
-      if (!res.ok) throw new Error("ایمیل یا رمز عبور اشتباه است");
-
-      const data = await res.json();
-      console.log(data);
+      // اگر توکن در body برمی‌گردد می‌تونی این را فعال کنی
       // localStorage.setItem("access_token", data.access_token);
+
       navigate("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "خطایی رخ داده است");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message || "خطایی رخ داده است");
+      } else {
+        setError("خطای ناشناخته‌ای رخ داده است");
+      }
     } finally {
       setLoading(false);
     }
@@ -86,7 +108,9 @@ export default function LoginPage() {
         />
 
         <input
-          className={`login-input ${fieldErrors.password ? "input-error" : ""}`}
+          className={`login-input ${
+            fieldErrors.password ? "input-error" : ""
+          }`}
           type="password"
           name="password"
           placeholder="رمز عبور"
@@ -101,6 +125,7 @@ export default function LoginPage() {
         <button className="login-button" disabled={loading}>
           {loading ? "لطفا صبر کنید..." : "ورود"}
         </button>
+
         <p className="login-link">
           حساب ندارید؟ <Link to="/signup">ثبت‌نام کنید</Link>
         </p>

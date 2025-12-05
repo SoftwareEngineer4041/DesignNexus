@@ -3,10 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import "../styles/signup_page.css";
 import design_img from "../assets/design_img.png";
 
+import {
+  registerUser,
+  type RegisterForm,
+} from "../API/authAPI";
+
 export default function SignupPage() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<RegisterForm>({
     firstName: "",
     lastName: "",
     email: "",
@@ -16,41 +21,49 @@ export default function SignupPage() {
   });
 
   const [error, setError] = useState("");
-  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
 
-    setTouched((prev) => ({ ...prev, [e.target.name]: false }));
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setTouched((prev) => ({ ...prev, [name]: false }));
     setError("");
   };
 
-  
-  const validateEmail = (value: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  };
+  const validateEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-  const validateEmpty = () => {
+  const validateFields = () => {
     const emptyFields = Object.keys(form).filter(
       (key) => (form as any)[key].trim() === ""
     );
 
     if (emptyFields.length > 0) {
       setError("لطفاً تمام فیلدها را پر کنید");
+
       setTouched(
-        emptyFields.reduce((acc, field) => {
-          acc[field] = true;
+        emptyFields.reduce((acc, key) => {
+          acc[key] = true;
           return acc;
-        }, {} as any)
+        }, {} as Record<string, boolean>)
       );
+
+      return false;
+    }
+
+    if (!validateEmail(form.email)) {
+      setError("ایمیل معتبر نیست");
+      setTouched((prev) => ({ ...prev, email: true }));
       return false;
     }
 
     if (form.password !== form.confirmPassword) {
-      setError("رمز عبور و تکرار آن مطابقت ندارند");
+      setError("رمز عبور و تکرار آن یکسان نیست");
       setTouched({ password: true, confirmPassword: true });
       return false;
     }
@@ -58,71 +71,29 @@ export default function SignupPage() {
     return true;
   };
 
-  const handleGoVerify = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setError("");
 
-    // ✔ چک خالی بودن
-    if (!validateEmpty()) {
-      return;
-    }
-
-    // ✔ چک ایمیل درست
-    if (!validateEmail(form.email)) {
-      setError("ایمیل نامعتبر است.");
-      setTouched((prev) => ({ ...prev, email: true }));
-      return;
-    }
+    if (!validateFields()) return;
 
     setLoading(true);
 
-    const payload = {
-      fullName: `${form.firstName} ${form.lastName}`,
-      email: form.email,
-      password: form.password,
-      confirmPassword: form.confirmPassword,
-      role: form.role,
-    };
-
     try {
-      const response = await fetch(
-        "http://localhost:5209/api/Auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await registerUser(form);
 
-      const data = await response.json();
+      console.log("Signup success:", response);
 
-      console.log("payload:", payload);
-      console.log("server response:", data);
+      // ذخیره ایمیل برای صفحه Verify
+      localStorage.setItem("signupEmail", form.email);
 
-      if (response.ok) {
-        localStorage.setItem("signupEmail", form.email);
-
-        navigate("/verify", {
-          state: { email: form.email },
-        });
-
-      } else {
-        if (data?.errors) {
-          const firstKey = Object.keys(data.errors)[0];
-          const firstMessage = data.errors[firstKey][0];
-          setError(firstMessage);
-        } else if (data?.message) {
-          setError(data.message);
-        } else {
-          setError("خطای نامشخصی رخ داده");
-        }
-        return;
-      }
+      navigate("/verify", { state: { email: form.email } });
     } catch (err) {
-      console.error("Error sending signup data:", err);
-      setError("اتصال به سرور برقرار نشد. دوباره تلاش کنید");
+      if (err instanceof Error) {
+        setError(err.message || "خطای ناشناخته‌ای رخ داده");
+      } else {
+        setError("خطای ناشناخته‌ای رخ داده");
+      }
     } finally {
       setLoading(false);
     }
@@ -181,7 +152,7 @@ export default function SignupPage() {
           style={{ borderColor: touched.password ? "red" : "#ccc" }}
           type="password"
           name="password"
-          placeholder="رمزعبور"
+          placeholder="رمز عبور"
           value={form.password}
           onChange={handleChange}
         />
@@ -191,7 +162,7 @@ export default function SignupPage() {
           style={{ borderColor: touched.confirmPassword ? "red" : "#ccc" }}
           type="password"
           name="confirmPassword"
-          placeholder="تکرار رمزعبور"
+          placeholder="تکرار رمز عبور"
           value={form.confirmPassword}
           onChange={handleChange}
         />
@@ -199,7 +170,7 @@ export default function SignupPage() {
         <button
           type="button"
           className="signup-button"
-          onClick={handleGoVerify}
+          onClick={handleSignup}
           disabled={loading}
         >
           {loading ? "در حال ارسال..." : "ثبت نام"}
