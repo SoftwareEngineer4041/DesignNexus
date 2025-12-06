@@ -100,5 +100,22 @@ namespace IAM.Api.Controllers
             return Unauthorized(result);
         }
 
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
+        {
+            _logger.LogInformation($"Change-password attempt for email: {request.Email}");
+            
+            var command = new ChangePasswordCommand(request);
+            var result = await _mediator.Send(command);
+            
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            
+            return Unauthorized(result);
+        }
+
+
     }
 }
