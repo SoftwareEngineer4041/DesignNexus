@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // 👈 useNavigate اضافه شد
+import { Link, useNavigate } from "react-router-dom"; 
 import "../styles/reset_password.css";
 
 import {
@@ -87,7 +87,7 @@ export default function PasswordResetPage() {
           {success && <p className="pr-success">{success}</p>}
 
           <button type="submit" className="pr-button" disabled={loading}>
-            {loading ? "در حال ارسال..." : "ارسال لینک"}
+            {loading ? "در حال ارسال..." : " تایید"}
           </button>
         </form>
 

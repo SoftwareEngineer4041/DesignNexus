@@ -272,7 +272,7 @@ export interface VerifyResponse {
 export async function verifyCodeToChangePassword(
   payload: VerifyPayload
 ): Promise<VerifyResponse> {
-  const response = await fetch(`${BASE_URL}/api/Auth/verify`, {
+  const response = await fetch(`${BASE_URL}/api/Auth/verify-change-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
