@@ -38,21 +38,12 @@ export default function PasswordResetPage() {
     const payload: PasswordResetPayload = { email };
 
     try {
-      // فرض می‌کنیم بک‌اند در صورت نبودن ایمیل خطا می‌دهد
-      // (مثلاً 404 یا 400) و اینجا catch می‌شود.
       await sendPasswordResetLink(payload);
 
-      // ✅ اگر درخواست موفق بود، برو به صفحه‌ی verify
-      // و ایمیل را با state بفرست
       navigate("/verify-change-password", { state: { email } });
 
-      // اگر دوست داری می‌تونی موفقیت هم ست کنی
-      // setSuccess("اگر ایمیل شما ثبت شده باشد، لینک بازنشانی ارسال خواهد شد.");
-      // setEmail("");
     } catch (err) {
       if (err instanceof Error) {
-        // اینجا می‌تونی بر اساس پیام بک‌اند تشخیص بدی
-        // که ایمیل وجود نداشت و پیام مناسب بدهی
         setError(err.message || "خطا در ارتباط با سرور.");
       } else {
         setError("خطا در ارتباط با سرور.");

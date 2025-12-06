@@ -20,9 +20,9 @@ export default function VerifyCodePage() {
   const [error, setError] = useState("");
 
   const [resendLoading, setResendLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(300); // 5 دقیقه
+  const [resendTimer, setResendTimer] = useState(300); 
 
-  /* ---------------------- Load Email from State or LocalStorage ---------------------- */
+  /* ---------------------- Load Email from LocalStorage ---------------------- */
   useEffect(() => {
     const stateEmail = (location.state as any)?.email;
     const savedEmail = localStorage.getItem("signupEmail");

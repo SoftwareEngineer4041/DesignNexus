@@ -1,5 +1,3 @@
-// SignupPage.tsx
-
 import { useState, type ChangeEvent, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/signup_page.css";

@@ -23,7 +23,6 @@ export default function VerifyToChangePassword() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(300);
 
-  // بارگذاری ایمیل
   useEffect(() => {
     const stateEmail = (location.state as any)?.email;
     const savedEmail = localStorage.getItem("userEmailToChangePass");
@@ -38,7 +37,6 @@ export default function VerifyToChangePassword() {
     }
   }, [location.state]);
 
-  // تایمر resend
   useEffect(() => {
     if (resendTimer <= 0) return;
     const timer = setTimeout(() => setResendTimer((t) => t - 1), 1000);

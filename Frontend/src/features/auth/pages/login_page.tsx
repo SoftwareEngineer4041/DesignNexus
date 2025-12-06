@@ -1,5 +1,3 @@
-// LoginPage.tsx
-
 import {
   useState,
   type ChangeEvent,
@@ -9,7 +7,6 @@ import { useNavigate, Link } from "react-router-dom";
 import "../styles/login_page.css";
 import design_img from "../assets/design_img.png";
 import { loginUser } from "../API/authAPI"; 
-// ⬆️ مسیر را با توجه به ساختار خودت تنظیم کن
 
 interface LoginFormState {
   email: string;
@@ -75,9 +72,6 @@ export default function LoginPage() {
       });
 
       console.log("Login success:", data);
-
-      // اگر توکن در body برمی‌گردد می‌تونی این را فعال کنی
-      // localStorage.setItem("access_token", data.access_token);
 
       navigate("/dashboard");
     } catch (err) {

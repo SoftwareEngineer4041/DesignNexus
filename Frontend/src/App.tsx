@@ -18,9 +18,7 @@ function App() {
         <Route path="/dashboard" element={<WelcomePage />} />
         <Route path="/verify-change-password" element={<VerifyToChangePassword />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
-
-        <Route path="/" element={<LoginPage />} /> {/* صفحه پیش‌فرض */}
-        {/* <Route path="*" element={<LoginPage />} /> */}
+        <Route path="/" element={<LoginPage />} />
       </Routes>
     </Router>
   );
