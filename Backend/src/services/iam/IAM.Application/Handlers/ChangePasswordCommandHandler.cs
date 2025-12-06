@@ -41,7 +41,7 @@ namespace IAM.Application.Handlers
                 return AuthResponseDto.FailureResponse("کاربری با این ایمیل یافت نشد");
             }
 
-            if (!await _otpService.ValidateOtpAsync(request.Email, request.Otp))
+            if (!await _otpService.ValidateOtpAsync(request.Email, request.Otp, true))
             {
                 return AuthResponseDto.FailureResponse("کد otp منقضی شده است");
             }

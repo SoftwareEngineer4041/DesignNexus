@@ -116,6 +116,22 @@ namespace IAM.Api.Controllers
             return Unauthorized(result);
         }
 
+        [HttpPost("verify-change-password")]
+        public async Task<IActionResult> VerifyChangePassword([FromBody] VerifyChangePasswordRequestDto request)
+        {
+            _logger.LogInformation($"Change-password verify attempt for email: {request.Email}");
+            
+            var command = new VerifyChangePasswordCommand(request);
+            var result = await _mediator.Send(command);
+            
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            
+            return Unauthorized(result);
+        }
+
 
     }
 }

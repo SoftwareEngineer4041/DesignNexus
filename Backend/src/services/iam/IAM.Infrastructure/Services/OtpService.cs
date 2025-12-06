@@ -49,7 +49,7 @@ public class OtpService : IOtpService
         return otp; 
     }
 
-    public async Task<bool> ValidateOtpAsync(string email, string otp)
+    public async Task<bool> ValidateOtpAsync(string email, string otp, bool delete)
     {
         var cacheKey = $"otp:{email}";
         var storedOtp = await _cache.GetStringAsync(cacheKey);
@@ -57,7 +57,10 @@ public class OtpService : IOtpService
 
         if (isValid)
         {
-            await _cache.RemoveAsync(cacheKey);
+            if (delete)
+            {
+                await _cache.RemoveAsync(cacheKey);
+            }
             _logger.LogInformation($"OTP validated for {email}");
         }
         else
