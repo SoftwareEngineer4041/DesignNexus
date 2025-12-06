@@ -5,7 +5,7 @@ import design_img from "../assets/design_img.png";
 
 import {
   verifyCode,
-  resendCode,
+  resendVerificationCode,  
   type VerifyPayload,
   type ResendCodePayload,
 } from "../API/authAPI";
@@ -20,9 +20,9 @@ export default function VerifyCodePage() {
   const [error, setError] = useState("");
 
   const [resendLoading, setResendLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(300); 
+  const [resendTimer, setResendTimer] = useState(300);
 
-  /* ---------------------- Load Email from LocalStorage ---------------------- */
+  /* ---------------------- Load Email ---------------------- */
   useEffect(() => {
     const stateEmail = (location.state as any)?.email;
     const savedEmail = localStorage.getItem("signupEmail");
@@ -37,14 +37,14 @@ export default function VerifyCodePage() {
     }
   }, [location.state]);
 
-  /* ---------------------------------- Timer Logic ---------------------------------- */
+  /* ---------------------- Timer Logic ---------------------- */
   useEffect(() => {
     if (resendTimer <= 0) return;
     const timer = setTimeout(() => setResendTimer((t) => t - 1), 1000);
     return () => clearTimeout(timer);
   }, [resendTimer]);
 
-  /* -------------------------------- Submit Verify ---------------------------------- */
+  /* ---------------------- Submit Verify Code ---------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -54,7 +54,7 @@ export default function VerifyCodePage() {
       return;
     }
 
-    if (code.trim().length === 0) {
+    if (!code.trim()) {
       setError("کد تأیید را وارد کنید");
       return;
     }
@@ -70,6 +70,7 @@ export default function VerifyCodePage() {
         email,
         name: data?.name ?? email.split("@")[0],
         token: data?.token,
+        refreshToken: data?.refreshToken,  
       };
 
       localStorage.setItem("user", JSON.stringify(user));
@@ -87,7 +88,7 @@ export default function VerifyCodePage() {
     }
   };
 
-  /* -------------------------------- Resend Code -------------------------------- */
+  /* ---------------------- Resend Code ---------------------- */
   const handleResend = async () => {
     if (!email) {
       setError("ایمیل کاربر مشخص نیست.");
@@ -100,8 +101,8 @@ export default function VerifyCodePage() {
     const payload: ResendCodePayload = { email };
 
     try {
-      await resendCode(payload);
-      setResendTimer(300); // Reset timer
+      await resendVerificationCode(payload);
+      setResendTimer(300);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message || "خطا در ارسال کد جدید");
@@ -113,7 +114,7 @@ export default function VerifyCodePage() {
     }
   };
 
-  /* -------------------------------- Timer Format -------------------------------- */
+  /* ---------------------- Format Timer ---------------------- */
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -126,6 +127,7 @@ export default function VerifyCodePage() {
         <img src={design_img} className="verify-image" alt="design" />
 
         <h3 className="verify-title">کد تأیید را وارد کنید</h3>
+
         <p className="verify-subtitle">
           {email
             ? `کدی که به ایمیل ${email} ارسال شده را وارد کنید`

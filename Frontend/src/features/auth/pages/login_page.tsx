@@ -1,12 +1,8 @@
-import {
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/login_page.css";
 import design_img from "../assets/design_img.png";
-import { loginUser } from "../API/authAPI"; 
+import { loginUser } from "../API/authAPI";
 
 interface LoginFormState {
   email: string;
@@ -21,30 +17,15 @@ interface FieldErrors {
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState<LoginFormState>({
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState<LoginFormState>({ email: "", password: "" });
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({ email: false, password: false });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({
-    email: false,
-    password: false,
-  });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setFieldErrors((prev) => ({
-      ...prev,
-      [name]: false,
-    }));
+    setForm(prev => ({ ...prev, [name]: value }));
+    setFieldErrors(prev => ({ ...prev, [name]: false }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -57,14 +38,12 @@ export default function LoginPage() {
     };
 
     setFieldErrors(newErrors);
-
     if (newErrors.email || newErrors.password) {
       setError("لطفاً همه فیلدها را پر کنید");
       return;
     }
 
     setLoading(true);
-
     try {
       const data = await loginUser({
         email: form.email,
@@ -72,14 +51,10 @@ export default function LoginPage() {
       });
 
       console.log("Login success:", data);
-
       navigate("/dashboard");
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || "خطایی رخ داده است");
-      } else {
-        setError("خطای ناشناخته‌ای رخ داده است");
-      }
+      if (err instanceof Error) setError(err.message || "خطایی رخ داده است");
+      else setError("خطای ناشناخته‌ای رخ داده است");
     } finally {
       setLoading(false);
     }
@@ -102,9 +77,7 @@ export default function LoginPage() {
         />
 
         <input
-          className={`login-input ${
-            fieldErrors.password ? "input-error" : ""
-          }`}
+          className={`login-input ${fieldErrors.password ? "input-error" : ""}`}
           type="password"
           name="password"
           placeholder="رمز عبور"
