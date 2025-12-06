@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "../styles/verify_email_page.css";
+import "../styles/verify_to_change_password.css";
 import design_img from "../assets/design_img.png";
 
 import {
-  verifyCode,
+  verifyCodeToChangePassword,
   type VerifyPayload,
   type ResendCodePayload,
   resendCodeToChangePassword,
@@ -22,7 +22,6 @@ export default function VerifyToChangePassword() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(300); // 5 دقیقه
 
-  /* ---------------------- Load Email from State or LocalStorage ---------------------- */
   useEffect(() => {
     const stateEmail = (location.state as any)?.email;
     const savedEmail = localStorage.getItem("userEmailToChangePass");
@@ -37,14 +36,12 @@ export default function VerifyToChangePassword() {
     }
   }, [location.state]);
 
-  /* ---------------------------------- Timer Logic ---------------------------------- */
   useEffect(() => {
     if (resendTimer <= 0) return;
     const timer = setTimeout(() => setResendTimer((t) => t - 1), 1000);
     return () => clearTimeout(timer);
   }, [resendTimer]);
 
-  /* -------------------------------- Submit Verify ---------------------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -64,7 +61,7 @@ export default function VerifyToChangePassword() {
     const payload: VerifyPayload = { email, otp: code };
 
     try {
-      const data = await verifyCode(payload);
+      const data = await verifyCodeToChangePassword(payload);
 
       const user = {
         email,
@@ -74,21 +71,17 @@ export default function VerifyToChangePassword() {
 
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("otp", code);
+      localStorage.setItem("reset_email", email); // ✅ برای Change Password
       localStorage.removeItem("userEmailToChangePass");
 
       navigate("/change-password");
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || "خطا در ارتباط با سرور");
-      } else {
-        setError("خطای ناشناخته‌ای رخ داد");
-      }
+    } catch (err: any) {
+      setError(err.message || "خطا در ارتباط با سرور");
     } finally {
       setLoading(false);
     }
   };
 
-  /* -------------------------------- Resend Code -------------------------------- */
   const handleResend = async () => {
     if (!email) {
       setError("ایمیل کاربر مشخص نیست.");
@@ -103,18 +96,13 @@ export default function VerifyToChangePassword() {
     try {
       await resendCodeToChangePassword(payload);
       setResendTimer(300); // Reset timer
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || "خطا در ارسال کد جدید");
-      } else {
-        setError("خطای ناشناخته‌ای رخ داد");
-      }
+    } catch (err: any) {
+      setError(err.message || "خطا در ارسال کد جدید");
     } finally {
       setResendLoading(false);
     }
   };
 
-  /* -------------------------------- Timer Format -------------------------------- */
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;

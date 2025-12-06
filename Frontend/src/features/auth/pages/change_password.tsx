@@ -6,7 +6,6 @@ import "../styles/change_password.css";
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
 
-  // گرفتن ایمیل از localStorage
   const email = localStorage.getItem("reset_email") || "";
 
   const [form, setForm] = useState({
@@ -25,7 +24,6 @@ export default function ChangePasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setError("");
     setSuccess("");
 
@@ -41,9 +39,8 @@ export default function ChangePasswordPage() {
 
     try {
       setLoading(true);
-
       await changePassword({
-        email: email,
+        email,
         otp: form.otp,
         password: form.password,
         confirmPassword: form.confirmPassword,
@@ -52,9 +49,7 @@ export default function ChangePasswordPage() {
       setSuccess("رمز عبور با موفقیت تغییر کرد!");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
-      setError(
-        err.message || "خطا در تغییر رمز عبور. لطفاً دوباره تلاش کنید."
-      );
+      setError(err.message || "خطا در تغییر رمز عبور. لطفاً دوباره تلاش کنید.");
     } finally {
       setLoading(false);
     }
