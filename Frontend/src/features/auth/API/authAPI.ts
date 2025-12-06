@@ -39,9 +39,7 @@ export async function loginUser(
 
 /* ---------- Register ---------- */
 
-// authAPI.ts
 
-// اینو خودت از قبل داشتی
 export interface RegisterForm {
   fullName: string;
   email: string;
@@ -126,7 +124,7 @@ export async function verifyCode(
   return await response.json();
 }
 
-/* ---------- Resend Code ---------- */
+/* ---------- Resend Code to Signup---------- */
 
 export interface ResendCodePayload {
   email: string;   
@@ -155,6 +153,66 @@ export async function resendCode(
 
   return await response.json();
 }
+
+
+
+//-------------------verify code to change password-----------------//
+
+
+export interface ResendCodePayload {
+  email: string;   
+}
+
+export async function resendCodeToChangePassword(
+  payload: ResendCodePayload
+): Promise<{ message: string }> {
+  const response = await fetch(`${BASE_URL}/api/Auth/resend-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    let message = "خطا در ارسال کد جدید";
+
+    try {
+      const err = await response.json();
+      if (err?.message) message = err.message;
+    } catch {}
+
+    throw new Error(message);
+  }
+
+  return await response.json();
+}
+
+
+
+
+// -------------------------------
+// CHANGE PASSWORD
+// -------------------------------
+export async function changePassword(payload: {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  otp : string;
+}) {
+  const res = await fetch(`${BASE_URL}/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || "تغییر رمز عبور انجام نشد");
+  }
+
+  return res.json();
+}
+
 
 
 /* ---------- Password Reset (Forgot Password) ---------- */
