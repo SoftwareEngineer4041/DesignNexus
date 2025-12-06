@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/verify_to_change_password.css";
 import design_img from "../assets/design_img.png";
+import logoImg from "../assets/logo.jpg"; // ✅ تصویر بک‌گراند
 
 import {
   verifyCodeToChangePassword,
@@ -22,6 +23,7 @@ export default function VerifyToChangePassword() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(300); // 5 دقیقه
 
+  // بارگذاری ایمیل
   useEffect(() => {
     const stateEmail = (location.state as any)?.email;
     const savedEmail = localStorage.getItem("userEmailToChangePass");
@@ -36,6 +38,7 @@ export default function VerifyToChangePassword() {
     }
   }, [location.state]);
 
+  // تایمر resend
   useEffect(() => {
     if (resendTimer <= 0) return;
     const timer = setTimeout(() => setResendTimer((t) => t - 1), 1000);
@@ -57,7 +60,6 @@ export default function VerifyToChangePassword() {
     }
 
     setLoading(true);
-
     const payload: VerifyPayload = { email, otp: code };
 
     try {
@@ -111,43 +113,50 @@ export default function VerifyToChangePassword() {
 
   return (
     <div className="verify-container">
-      <form className="verify-card" onSubmit={handleSubmit}>
-        <img src={design_img} className="verify-image" alt="design" />
-
-        <h3 className="verify-title">کد تأیید را وارد کنید</h3>
-        <p className="verify-subtitle">
-          {email
-            ? `کدی که به ایمیل ${email} ارسال شده را وارد کنید`
-            : "کدی که به ایمیل شما ارسال شده را وارد کنید"}
-        </p>
-
-        {error && <p className="verify-error">{error}</p>}
-
-        <input
-          className="verify-input"
-          type="text"
-          placeholder="کد تأیید"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
+      <div className="verify-card">
+        {/* بک‌گراند با تصویر */}
+        <div
+          className="card-background"
+          style={{ backgroundImage: `url(${logoImg})` }}
         />
+        <div className="card-content">
+          <img src={design_img} className="verify-image" alt="design" />
 
-        <button className="verify-button" disabled={loading}>
-          {loading ? "در حال بررسی..." : "تأیید"}
-        </button>
+          <h3 className="verify-title">کد تأیید را وارد کنید</h3>
+          <p className="verify-subtitle">
+            {email
+              ? `کدی که به ایمیل ${email} ارسال شده را وارد کنید`
+              : "کدی که به ایمیل شما ارسال شده را وارد کنید"}
+          </p>
 
-        <div className="resend-container">
-          <span className="resend-timer">{formatTime(resendTimer)}</span>
+          {error && <p className="verify-error">{error}</p>}
 
-          <button
-            type="button"
-            className="resend-button"
-            onClick={handleResend}
-            disabled={resendLoading || resendTimer > 0}
-          >
-            {resendLoading ? "در حال ارسال..." : "ارسال مجدد کد"}
+          <input
+            className="verify-input"
+            type="text"
+            placeholder="کد تأیید"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+
+          <button className="verify-button" disabled={loading}>
+            {loading ? "در حال بررسی..." : "تأیید"}
           </button>
+
+          <div className="resend-container">
+            <span className="resend-timer">{formatTime(resendTimer)}</span>
+
+            <button
+              type="button"
+              className="resend-button"
+              onClick={handleResend}
+              disabled={resendLoading || resendTimer > 0}
+            >
+              {resendLoading ? "در حال ارسال..." : "ارسال مجدد کد"}
+            </button>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
