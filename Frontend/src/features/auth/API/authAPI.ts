@@ -1,5 +1,5 @@
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5209";
+const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5157/iam";
 
 /* ---------- Login ---------- */
 
@@ -129,7 +129,7 @@ export async function verifyCode(
 /* ---------- Resend Code ---------- */
 
 export interface ResendCodePayload {
-  email: string;
+  email: string;   
 }
 
 export async function resendCode(
