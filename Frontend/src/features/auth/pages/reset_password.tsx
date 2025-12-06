@@ -44,7 +44,7 @@ export default function PasswordResetPage() {
 
       // ✅ اگر درخواست موفق بود، برو به صفحه‌ی verify
       // و ایمیل را با state بفرست
-      navigate("/verify", { state: { email } });
+      navigate("/verify-change-password", { state: { email } });
 
       // اگر دوست داری می‌تونی موفقیت هم ست کنی
       // setSuccess("اگر ایمیل شما ثبت شده باشد، لینک بازنشانی ارسال خواهد شد.");
