@@ -319,6 +319,7 @@ export async function resendCodeToChangePassword(
 }
 
 /* ---------- Change Password ---------- */
+
 export interface ChangePasswordPayload {
   email: string;
   password: string;
@@ -326,7 +327,8 @@ export interface ChangePasswordPayload {
   otp: string;
 }
 
-export async function changePassword(payload: ChangePasswordPayload) {
+// تابع بدون تکرار export
+export const changePassword = async (payload: ChangePasswordPayload) => {
   const res = await fetch(`${BASE_URL}/api/Auth/change-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -339,7 +341,8 @@ export async function changePassword(payload: ChangePasswordPayload) {
   }
 
   return res.json();
-}
+};
+
 
 
 

@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { changePassword } from "../API/authAPI";
 import "../styles/change_password.css";
+import { changePassword, type ChangePasswordPayload } from "../API/authAPI";
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
 
   const email = localStorage.getItem("reset_email") || "";
+  const otp = localStorage.getItem("otp") || "";
 
   const [form, setForm] = useState({
-    otp: "",
     password: "",
     confirmPassword: "",
   });
@@ -27,29 +27,36 @@ export default function ChangePasswordPage() {
     setError("");
     setSuccess("");
 
+    if (!email || !otp) {
+      setError("ایمیل یا کد OTP یافت نشد.");
+      return;
+    }
+
     if (form.password !== form.confirmPassword) {
       setError("رمز عبور و تکرار آن یکسان نیست!");
       return;
     }
 
-    if (!email) {
-      setError("ایمیل در localStorage یافت نشد!");
-      return;
-    }
-
     try {
       setLoading(true);
-      await changePassword({
+
+      const payload: ChangePasswordPayload = {
         email,
-        otp: form.otp,
+        otp,
         password: form.password,
         confirmPassword: form.confirmPassword,
-      });
+      };
+
+      await changePassword(payload);
 
       setSuccess("رمز عبور با موفقیت تغییر کرد!");
+      localStorage.removeItem("reset_email");
+      localStorage.removeItem("otp");
+
       setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
-      setError(err.message || "خطا در تغییر رمز عبور. لطفاً دوباره تلاش کنید.");
+      console.error(err);
+      setError(err?.message || "خطا در تغییر رمز عبور. لطفاً دوباره تلاش کنید.");
     } finally {
       setLoading(false);
     }
@@ -59,15 +66,6 @@ export default function ChangePasswordPage() {
     <div className="change-pass-container">
       <form className="change-pass-form" onSubmit={handleSubmit}>
         <h2>تغییر رمز عبور</h2>
-
-        <label>کد تأیید (OTP)</label>
-        <input
-          type="text"
-          name="otp"
-          value={form.otp}
-          onChange={handleChange}
-          required
-        />
 
         <label>رمز عبور جدید</label>
         <input

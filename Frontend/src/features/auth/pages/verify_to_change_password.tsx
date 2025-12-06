@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/verify_to_change_password.css";
 import design_img from "../assets/design_img.png";
-import logoImg from "../assets/logo.jpg"; // ✅ تصویر بک‌گراند
+import logoImg from "../assets/logo.jpg";
 
 import {
   verifyCodeToChangePassword,
@@ -21,7 +21,7 @@ export default function VerifyToChangePassword() {
   const [error, setError] = useState("");
 
   const [resendLoading, setResendLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(300); // 5 دقیقه
+  const [resendTimer, setResendTimer] = useState(300);
 
   // بارگذاری ایمیل
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function VerifyToChangePassword() {
     return () => clearTimeout(timer);
   }, [resendTimer]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
@@ -54,31 +54,33 @@ export default function VerifyToChangePassword() {
       return;
     }
 
-    if (code.trim().length === 0) {
+    if (!code.trim()) {
       setError("کد تأیید را وارد کنید");
       return;
     }
 
-    setLoading(true);
-    const payload: VerifyPayload = { email, otp: code };
-
     try {
+      setLoading(true);
+
+      const payload: VerifyPayload = { email, otp: code };
       const data = await verifyCodeToChangePassword(payload);
 
-      const user = {
-        email,
-        name: data?.name ?? email.split("@")[0],
-        token: data?.token,
-      };
-
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          email,
+          name: data?.name ?? email.split("@")[0],
+          token: data?.token,
+        })
+      );
       localStorage.setItem("otp", code);
-      localStorage.setItem("reset_email", email); // ✅ برای Change Password
+      localStorage.setItem("reset_email", email);
       localStorage.removeItem("userEmailToChangePass");
 
       navigate("/change-password");
     } catch (err: any) {
-      setError(err.message || "خطا در ارتباط با سرور");
+      console.error(err);
+      setError(err?.message || "خطا در ارتباط با سرور");
     } finally {
       setLoading(false);
     }
@@ -97,31 +99,23 @@ export default function VerifyToChangePassword() {
 
     try {
       await resendCodeToChangePassword(payload);
-      setResendTimer(300); // Reset timer
+      setResendTimer(300);
     } catch (err: any) {
-      setError(err.message || "خطا در ارسال کد جدید");
+      setError(err?.message || "خطا در ارسال کد جدید");
     } finally {
       setResendLoading(false);
     }
   };
 
-  const formatTime = (sec: number) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
   return (
     <div className="verify-container">
-      <div className="verify-card">
-        {/* بک‌گراند با تصویر */}
+      <form className="verify-card" onSubmit={handleSubmit}>
         <div
           className="card-background"
           style={{ backgroundImage: `url(${logoImg})` }}
         />
         <div className="card-content">
           <img src={design_img} className="verify-image" alt="design" />
-
           <h3 className="verify-title">کد تأیید را وارد کنید</h3>
           <p className="verify-subtitle">
             {email
@@ -139,12 +133,18 @@ export default function VerifyToChangePassword() {
             onChange={(e) => setCode(e.target.value)}
           />
 
-          <button className="verify-button" disabled={loading}>
+          <button className="verify-button" type="submit" disabled={loading}>
             {loading ? "در حال بررسی..." : "تأیید"}
           </button>
 
           <div className="resend-container">
-            <span className="resend-timer">{formatTime(resendTimer)}</span>
+            <span className="resend-timer">
+              {Math.floor(resendTimer / 60)
+                .toString()
+                .padStart(2, "0")}
+              :
+              {(resendTimer % 60).toString().padStart(2, "0")}
+            </span>
 
             <button
               type="button"
@@ -156,7 +156,7 @@ export default function VerifyToChangePassword() {
             </button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
